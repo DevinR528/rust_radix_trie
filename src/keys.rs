@@ -1,14 +1,15 @@
-use crate::NibbleVec;
 use endian_type::{BigEndian, LittleEndian};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
+
+use nibvec::Nibblet;
 
 /// Trait for types which can be used to key a Radix Trie.
 ///
 /// Types that implement this trait should be convertible to a vector of half-bytes (nibbles)
 /// such that no two instances of the type convert to the same vector.
 /// To protect against faulty behaviour, the trie will **panic** if it finds two distinct keys
-/// of type `K` which encode to the same `NibbleVec`, so be careful!
+/// of type `K` which encode to the same `Nibblet`, so be careful!
 ///
 /// If you would like to implement this trait for your own type, you need to implement
 /// *either* `encode_bytes` or `encode`. You only need to implement one of the two.
@@ -25,8 +26,9 @@ pub trait TrieKey: PartialEq + Eq {
     }
 
     /// Encode a value as a NibbleVec.
-    fn encode(&self) -> NibbleVec {
-        NibbleVec::from_byte_vec(self.encode_bytes())
+    #[inline]
+    fn encode(&self) -> Nibblet {
+        Nibblet::from_byte_vec(self.encode_bytes())
     }
 }
 
@@ -46,7 +48,8 @@ pub enum KeyMatch {
 /// Compare two Trie keys.
 ///
 /// Compares `first[start_idx .. ]` to `second`, i.e. only looks at a slice of the first key.
-pub fn match_keys(start_idx: usize, first: &NibbleVec, second: &NibbleVec) -> KeyMatch {
+#[inline]
+pub fn match_keys(start_idx: usize, first: &Nibblet, second: &Nibblet) -> KeyMatch {
     let first_len = first.len() - start_idx;
     let min_length = ::std::cmp::min(first_len, second.len());
 
@@ -64,6 +67,7 @@ pub fn match_keys(start_idx: usize, first: &NibbleVec, second: &NibbleVec) -> Ke
 }
 
 /// Check two keys for equality and panic if they differ.
+#[inline]
 pub fn check_keys<K: ?Sized>(key1: &K, key2: &K)
 where
     K: TrieKey,
@@ -83,42 +87,49 @@ where
 // }
 
 impl TrieKey for Vec<u8> {
+    #[inline]
     fn encode_bytes(&self) -> Vec<u8> {
         self.clone()
     }
 }
 
 impl TrieKey for [u8] {
+    #[inline]
     fn encode_bytes(&self) -> Vec<u8> {
         self.to_vec()
     }
 }
 
 impl TrieKey for String {
+    #[inline]
     fn encode_bytes(&self) -> Vec<u8> {
         self.as_bytes().encode_bytes()
     }
 }
 
 impl TrieKey for str {
+    #[inline]
     fn encode_bytes(&self) -> Vec<u8> {
         self.as_bytes().encode_bytes()
     }
 }
 
 impl<'a, T: ?Sized + TrieKey> TrieKey for &'a T {
+    #[inline]
     fn encode_bytes(&self) -> Vec<u8> {
         (**self).encode_bytes()
     }
 }
 
 impl<'a, T: ?Sized + TrieKey> TrieKey for &'a mut T {
+    #[inline]
     fn encode_bytes(&self) -> Vec<u8> {
         (**self).encode_bytes()
     }
 }
 
 impl TrieKey for i8 {
+    #[inline]
     fn encode_bytes(&self) -> Vec<u8> {
         let mut v: Vec<u8> = Vec::with_capacity(1);
         v.push(*self as u8);
@@ -127,6 +138,7 @@ impl TrieKey for i8 {
 }
 
 impl TrieKey for u8 {
+    #[inline]
     fn encode_bytes(&self) -> Vec<u8> {
         let mut v: Vec<u8> = Vec::with_capacity(1);
         v.push(*self);

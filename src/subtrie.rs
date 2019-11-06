@@ -3,6 +3,8 @@ use crate::TrieNode;
 use crate::{NibbleVec, SubTrie, SubTrieMut, SubTrieResult};
 use std::borrow::Borrow;
 
+use nibvec::Nibblet;
+
 impl<'a, K, V> SubTrie<'a, K, V>
 where
     K: TrieKey,
@@ -21,7 +23,7 @@ where
 }
 
 fn subtrie_get<'a, K, Q: ?Sized, V>(
-    prefix: &NibbleVec,
+    prefix: &Nibblet,
     node: &'a TrieNode<K, V>,
     key: &Q,
 ) -> SubTrieResult<&'a V>
@@ -107,6 +109,6 @@ where
     }
 }
 
-fn stripped(mut key: NibbleVec, prefix: &NibbleVec) -> NibbleVec {
+fn stripped(mut key: Nibblet, prefix: &Nibblet) -> Nibblet {
     key.split(prefix.len())
 }
