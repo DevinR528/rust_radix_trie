@@ -90,12 +90,7 @@ get_func!(name: iterative_get, trie_type: &'a TrieNode<K, V>, mutability: );
 get_func!(name: iterative_get_mut, trie_type: &'a mut TrieNode<K, V>, mutability: mut);
 
 #[inline]
-fn iterative_insert<K, V>(
-    trie: &mut TrieNode<K, V>,
-    key: K,
-    value: V,
-    mut nv: Nibblet,
-) -> Option<V>
+fn iterative_insert<K, V>(trie: &mut TrieNode<K, V>, key: K, value: V, mut nv: Nibblet) -> Option<V>
 where
     K: TrieKey,
 {
@@ -314,10 +309,7 @@ where
     }
 }
 #[inline]
-fn get_raw_ancestor<'a, K, V>(
-    trie: &'a TrieNode<K, V>,
-    nv: &Nibblet,
-) -> (&'a TrieNode<K, V>, usize)
+fn get_raw_ancestor<'a, K, V>(trie: &'a TrieNode<K, V>, nv: &Nibblet) -> (&'a TrieNode<K, V>, usize)
 where
     K: TrieKey,
 {

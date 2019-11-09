@@ -34,10 +34,9 @@ fn trie_get(b: &mut Criterion) {
     let trie = make_trie(&words);
     b.bench_function("trie get", |b| {
         b.iter(|| {
-            words
-                .iter()
-                .map(|w| trie.get(&&w[..]))
-                .collect::<Vec<Option<&usize>>>()
+            for w in words.iter() {
+                trie.get(&&w[..]);
+            }
         })
     });
 }

@@ -214,3 +214,41 @@ macro_rules! int_keys {
 }
 
 int_keys!(u16, u32, u64, i16, i32, i64, usize, isize);
+
+#[cfg(test)]
+mod test {
+    pub trait DefaultTrieKey {
+        fn encode_bytes(&self) -> Vec<u8>;
+    }
+
+    impl<T: Into<Vec<u8>> + Clone + PartialEq + Eq> DefaultTrieKey for T {
+        #[inline]
+        fn encode_bytes(&self) -> Vec<u8> {
+            self.clone().into()
+        }
+    }
+
+    pub trait AsTrieKey {
+        fn encode_bytes(&self) -> Vec<u8>;
+    }
+
+    impl<T: AsRef<[u8]> + Clone + PartialEq + Eq> AsTrieKey for &T {
+        #[inline]
+        fn encode_bytes(&self) -> Vec<u8> {
+            self.as_ref().to_vec()
+        }
+    }
+
+    macro_rules! encode_bytes {
+        ($e:expr) => {
+            (&$e).encode_bytes()
+        };
+    }
+
+    #[test]
+    fn test_autoref_specialization() {
+        let _ = encode_bytes!([0_u8]);
+        let _ = encode_bytes!("hello");
+        let _ = encode_bytes!("hello".to_string());
+    }
+}

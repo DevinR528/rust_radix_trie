@@ -16,7 +16,7 @@ categories = ["data-structures", "text-processing"]
 exclude = ["data"]
 
 [workspace]
-members = ["nibvec"]
+members = ["nibvec", "flame"]
 
 [dependencies]
 nibvec = { path = "./nibvec"}
@@ -39,3 +39,6 @@ bench = false
 
 [badges]
 travis-ci = { repository = "michaelsproul/rust_radix_trie" }
+
+[profile.release]
+debug = true
